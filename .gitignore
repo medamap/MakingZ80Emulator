@@ -1,0 +1,24 @@
+# コンパイル済みバイナリ
+*.o
+*.obj
+*.exe
+*.bin
+*.hex
+*.map
+*.out
+
+# IDEの設定ファイル
+.vscode/
+.idea/
+*.suo
+*.user
+*.ncb
+
+# キャッシュファイル・ログ
+*.log
+*.tmp
+
+# CMake/Makefile の生成ファイル（オプション）
+CMakeFiles/
+CMakeCache.txt
+Makefile
