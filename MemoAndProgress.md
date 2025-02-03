@@ -316,7 +316,7 @@ GPU 版の実装は CPU 版と異なり、並列処理に最適化する必要�
 ### 7.1 実行予定タスク
 
 #### **1. GitHubレポジトリ作成（Z80EmulatorModule）**
-- **フォルダ構成**
+- **フォルダ/ファイル構成**
   - csharp/ # ネイティブ C# 版
     - core/ # Z80 の共通ロジック
     - cli/ # CLI 版エミュレータ
@@ -327,11 +327,11 @@ GPU 版の実装は CPU 版と異なり、並列処理に最適化する必要�
     - ue5/ # UE5 対応版（ゲームエンジン向け）
   - gpu/ # GPU 版エミュレータ
     - core/ # GPU 版の共通ロジック
-    - gpu_cuda/ # CUDA 版
-    - gpu_opencl/ # OpenCL 版
-    - gpu_webgpu/ # WebGPU 版
-    - gpu_gles/ # GLSL (OpenGL ES) 版
-    - gpu_hlsl/ # HLSL (UE5 / Unity) 版
+    - cuda/ # CUDA 版
+    - opencl/ # OpenCL 版
+    - webgpu/ # WebGPU 版
+    - glsl/ # GLSL (OpenGL ES) 版
+    - hlsl/ # HLSL (UE5 / Unity) 版
   - game_engines/ # ゲームエンジン向けプロジェクト
     - unity/ # Unity プロジェクト
     - ue5/ # UE5 プロジェクト
@@ -361,12 +361,7 @@ GPU 版の実装は CPU 版と異なり、並列処理に最適化する必要�
   - **ボリュームマウント**
     - `../csharp` → `/languages/csharp`
     - `../cpp` → `/languages/cpp`
-    - `../gpu/core` → `/languages/gpu/core`
-    - `../gpu/gpu_cuda` → `/languages/gpu/cuda`
-    - `../gpu/gpu_opencl` → `/languages/gpu/opencl`
-    - `../gpu/gpu_webgpu` → `/languages/gpu/webgpu`
-    - `../gpu/gpu_gles` → `/languages/gpu/gles`
-    - `../gpu/gpu_hlsl` → `/languages/gpu/hlsl`
+    - `../gpu` → `/languages/gpu`
     - `../game_engines/unity` → `/languages/unity`
     - `../game_engines/ue5` → `/languages/ue5`
 
@@ -431,15 +426,10 @@ GPU 版の実装は CPU 版と異なり、並列処理に最適化する必要�
 ### **2.2 Docker コンテナのセットアップ**
 - `Dockerfile` にて、必要な開発ツールをインストール
 - `docker-compose.yml` で以下の環境をセットアップ：
-  - `z80_csharp`（C# 版）
-  - `z80_cpp`（C++ 版）
-  - `z80_cuda`（CUDA 版）
-  - `z80_opencl`（OpenCL 版）
-  - `z80_webgpu`（WebGPU 版）
-  - `z80_gles`（GLSL 版）
-  - `z80_hlsl`（HLSL 版）
-  - `unity_dev`（Unity 開発用）
-  - `ue5_dev`（UE5 開発用）
+  - `z80-cpu`（C#/C++ 版）
+  - `z80-gpu`（CUDA/OpenCL/WebGPU/GLSL/HLSL 版）
+  - `z80-unity`（Unity 開発用）
+  - `z80-ue5`（UE5 開発用）
 
 ---
 
@@ -459,8 +449,8 @@ GPU 版の実装は CPU 版と異なり、並列処理に最適化する必要�
 # 全環境をビルド & 起動
 docker-compose up --build -d
 
-# 個別に起動（例: CUDA 版）
-docker-compose up --build z80_cuda
+# 個別に起動（例: GPU 版）
+docker-compose up --build z80-gpu
 
 ---
 
@@ -585,7 +575,7 @@ GPU 版は CPU 版とは異なり、リアルタイムでのデバッグが難�
 
 ---
 
-## 9. 作業タスク（GPU 版対応）
+## 9. 作業タスク（CPU/GPU 版対応）
 
 ### **9.1 環境構築**
 1. **GitHub レポジトリ作成**
@@ -601,6 +591,9 @@ GPU 版は CPU 版とは異なり、リアルタイムでのデバッグが難�
      - `Dockerfile` を修正し、GPU 版を含めたマルチプラットフォーム対応  
      - `docker-compose.yml` を改良し、CPU 版 / GPU 版を簡単に切り替え可能にする  
      - `docker-compose up --build` で全バージョンの Z80 エミュレータを一括ビルド  
+     - `chrome` と `vscode` をインストールし `docker` 内で開発が行えるようにする
+     - docker 内に開発アカウント develop を設定し、開発中はそのアカウントを使用する
+     - `chrome` と `vscode` はアカウント develop で使用し、プロファイルも永続化する
    - **5.3 `.env` の設定例**
      - `.env` は CMake で Variant を設定できるなら不要になる可能性あり
      - GPU_BACKEND=CUDA # または OPENCL / WEBGPU / GLES / HLSL
@@ -682,11 +675,11 @@ GPU 版は CPU 版とは異なり、リアルタイムでのデバッグが難�
 ---
 
 ### **9.5 動作確認 & デバッグ**
-✅ **CPU 版 / C++ 版 / GPU 版をそれぞれステップ実行できるようにする**  
-✅ **レジスタダンプを全バージョンで取得し、正しく処理されているか確認**  
-✅ **GPU 版と CPU 版で結果を比較し、正しく動作するかを検証**  
-✅ **Docker 内で GPU 版が正しく動作するかテスト（CUDA / OpenCL / WebGPU）**  
-✅ **ゲームエンジン対応版の動作確認（Unity / UE5）**  
+- **CPU 版 / C++ 版 / GPU 版をそれぞれステップ実行できるようにする**  
+- **レジスタダンプを全バージョンで取得し、正しく処理されているか確認**  
+- **GPU 版と CPU 版で結果を比較し、正しく動作するかを検証**  
+- **Docker 内で GPU 版が正しく動作するかテスト（CUDA / OpenCL / WebGPU）**  
+- **ゲームエンジン対応版の動作確認（Unity / UE5）**  
 
 ---
 
